@@ -8,6 +8,7 @@
             "hash": "64efa21486e22194164ad7647bfa6de1c4812e8218a077142bc91dd566ef80a6"
         }
     },
+    "extract_dir": "chrome-win32",
     "shortcuts": [
         [
             "chrome.exe",
