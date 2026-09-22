@@ -2,6 +2,7 @@
     "version": "3.4",
     "description": "A lightweight C++ IDE",
     "homepage": "https://github.com/royqh1979/RedPanda-CPP",
+    "license": "GPL-3.0-or-later",
     "architecture": {
         "64bit": {
             "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v3.4/RedPanda.C++.3.4.win64.MinGW64_11.5.0.Portable.7z",
@@ -16,7 +17,7 @@
         ]
     ],
     "checkver": {
-        "github": "royqh1979/RedPanda-CPP",
+        "github": "https://github.com/royqh1979/RedPanda-CPP",
         "regex": "/releases/tag/v([\\d.]+)"
     },
     "autoupdate": {
