@@ -1,4 +1,3 @@
-```json
 {
     "version": "2.1.0",
     "description": "Debloat and harden Brave Browser using Chromium enterprise policies",
@@ -24,4 +23,3 @@
         "url": "https://github.com/ChaoticSi1ence/SlimBrave-Neo/archive/refs/tags/v$version.zip"
     }
 }
-```
