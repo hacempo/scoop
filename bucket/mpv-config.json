@@ -8,7 +8,11 @@
             "hash": "303111aae3438e37f3c21f32b32bd28c542b09b91a8d4484842574862d6923ea"
         }
     },
-    "extract_dir": "mpv_config-$version",
+    "pre_install": [
+        "$subdir = Get-ChildItem -Path $dir -Directory | Select-Object -First 1",
+        "Get-ChildItem -Path $subdir.FullName -Force | Move-Item -Destination $dir -Force",
+        "Remove-Item $subdir.FullName -Recurse -Force"
+    ],
     "shortcuts": [
         [
             "mpv.exe",
