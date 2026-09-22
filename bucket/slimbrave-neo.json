@@ -1,0 +1,25 @@
+{
+    "version": "2.1.0",
+    "description": "Debloat and harden Brave Browser using Chromium enterprise policies",
+    "homepage": "https://github.com/ChaoticSi1ence/SlimBrave-Neo",
+    "license": "GPL-3.0",
+    "url": "https://github.com/ChaoticSi1ence/SlimBrave-Neo/archive/refs/tags/v2.1.0.zip",
+    "pre_install": [
+        "$subdir = Get-ChildItem -Path $dir -Directory | Select-Object -First 1",
+        "Get-ChildItem -Path $subdir.FullName -Force | Move-Item -Destination $dir -Force",
+        "Remove-Item $subdir.FullName -Recurse -Force",
+        "@'\n@echo off\npowershell.exe -ExecutionPolicy Bypass -File \"%~dp0SlimBrave.ps1\"\n'@ | Set-Content -Path \"$dir\\SlimBrave.cmd\" -Encoding ASCII"
+    ],
+    "shortcuts": [
+        [
+            "SlimBrave.cmd",
+            "SlimBrave Neo"
+        ]
+    ],
+    "checkver": {
+        "github": "ChaoticSi1ence/SlimBrave-Neo"
+    },
+    "autoupdate": {
+        "url": "https://github.com/ChaoticSi1ence/SlimBrave-Neo/archive/refs/tags/v$version.zip"
+    }
+}
