@@ -2,22 +2,16 @@
     "version": "2.1.0",
     "description": "Debloat and harden Brave Browser using Chromium enterprise policies",
     "homepage": "https://github.com/ChaoticSi1ence/SlimBrave-Neo",
+    "license": "GPL-3.0",
     "url": "https://github.com/ChaoticSi1ence/SlimBrave-Neo/archive/refs/tags/v2.1.0.zip",
 
     "pre_install": [
         "$subdir = Get-ChildItem -Path $dir -Directory | Select-Object -First 1",
         "Get-ChildItem -Path $subdir.FullName -Force | Move-Item -Destination $dir -Force",
-        "Remove-Item $subdir.FullName -Recurse -Force",
-
-        "@'\nSet shell = CreateObject(\"WScript.Shell\")\nSet fso = CreateObject(\"Scripting.FileSystemObject\")\nscript = fso.BuildPath(fso.GetParentFolderName(WScript.ScriptFullName), \"SlimBrave.ps1\")\nshell.Run \"powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"\"\" & script & \"\"\"\", 0, False\n'@ | Set-Content -Path \"$dir\\SlimBrave.vbs\" -Encoding ASCII"
+        "Remove-Item $subdir.FullName -Recurse -Force"
     ],
 
-    "shortcuts": [
-        [
-            "SlimBrave.vbs",
-            "SlimBrave Neo"
-        ]
-    ],
+    "bin": "SlimBrave.ps1",
 
     "checkver": {
         "github": "ChaoticSi1ence/SlimBrave-Neo"
