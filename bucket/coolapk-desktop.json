@@ -1,0 +1,18 @@
+{
+    "version": "1.24.0",
+    "description": "Unofficial Coolapk desktop client",
+    "homepage": "https://github.com/daimiaopeng/coolapk-desktop",
+    "license": "MIT",
+    "url": "https://github.com/daimiaopeng/coolapk-desktop/releases/download/v1.24.0/coolapk-desktop_1.24.0_x64-portable.exe#/coolapk-desktop.exe",
+    "hash": "0e5dd4b62a36eddedf868e4b72ec5c0f6d9ded3753342ec887c8a7e3c0264326",
+    "shortcuts": [
+        [
+            "coolapk-desktop.exe",
+            "Coolapk Desktop"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/daimiaopeng/coolapk-desktop/releases/download/v$version/coolapk-desktop_$version_x64-portable.exe#/coolapk-desktop.exe"
+    }
+}
