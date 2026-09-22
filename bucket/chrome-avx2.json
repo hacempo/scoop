@@ -2,6 +2,7 @@
     "version": "155.0.8051.0-r1695130",
     "description": "Chromium browser compiled with Clang/LLVM, optimized for AVX2",
     "homepage": "https://github.com/RobRich999/Chromium_Clang",
+    "license": "Unknown",
     "architecture": {
         "64bit": {
             "url": "https://github.com/RobRich999/Chromium_Clang/releases/download/v155.0.8051.0-r1695130-win64-avx2/chrome.zip",
@@ -16,7 +17,7 @@
         ]
     ],
     "checkver": {
-        "github": "RobRich999/Chromium_Clang",
+        "github": "https://github.com/RobRich999/Chromium_Clang",
         "regex": "v([\\d.]+-r\\d+)-win64-avx2"
     },
     "autoupdate": {
