@@ -1,0 +1,29 @@
+{
+    "version": "3.4",
+    "description": "A lightweight C++ IDE",
+    "homepage": "https://github.com/royqh1979/RedPanda-CPP",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v3.4/RedPanda.C++.3.4.win64.MinGW64_11.5.0.Portable.7z",
+            "hash": "ba6b712802d5d28aa1a50f0225c01e59206d16c065730842ed7fae1e9cd925c5"
+        }
+    },
+    "extract_dir": "RedPanda-CPP",
+    "shortcuts": [
+        [
+            "RedPandaIDE.exe",
+            "Red Panda C++"
+        ]
+    ],
+    "checkver": {
+        "github": "royqh1979/RedPanda-CPP",
+        "regex": "/releases/tag/v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C++.$version.win64.MinGW64_11.5.0.Portable.7z"
+            }
+        }
+    }
+}
