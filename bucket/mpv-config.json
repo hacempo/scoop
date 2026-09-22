@@ -2,6 +2,7 @@
     "version": "2026.08.12",
     "description": "Customized mpv configuration and portable mpv package",
     "homepage": "https://github.com/dyphire/mpv-config",
+    "license": "Unknown",
     "architecture": {
         "64bit": {
             "url": "https://github.com/dyphire/mpv-config/releases/download/mpv_config-2026.08.12/mpv_config-2026.08.12.7z",
