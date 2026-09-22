@@ -20,7 +20,7 @@
         ]
     ],
     "checkver": {
-        "github": "dyphire/mpv-config",
+        "github": "https://github.com/dyphire/mpv-config",
         "regex": "mpv_config-([\\d.]+)"
     },
     "autoupdate": {
