@@ -1,0 +1,34 @@
+{
+    "version": "1.19.3",
+    "description": "A multi-platform network debugging and traffic splitting client based on Mihomo (Clash Meta)",
+    "homepage": "https://github.com/appshubcc/Bettbox",
+    "license": "GPL-3.0-or-later",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/appshubcc/Bettbox/releases/download/v1.19.3/Bettbox-1.19.3-windows-amd64-compatible-portable.zip",
+            "hash": "sha256:6e9142f4401026deb61c9fbad862d88e903f2dcf474c90c18fcd0301967fc2e2"
+        }
+    },
+    "shortcuts": [
+        [
+            "Bettbox.exe",
+            "Bettbox"
+        ]
+    ],
+    "persist": [
+        "portable"
+    ],
+    "checkver": {
+        "github": {
+            "repo": "appshubcc/Bettbox",
+            "channel": "latest"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/appshubcc/Bettbox/releases/download/v$version/Bettbox-$version-windows-amd64-compatible-portable.zip"
+            }
+        }
+    }
+}
