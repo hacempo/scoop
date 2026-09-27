@@ -19,9 +19,7 @@
         "portable"
     ],
     "checkver": {
-        "github": {
-            "channel": "latest"
-        }
+            "github": "https://github.com/appshubcc/Bettbox"
     },
     "autoupdate": {
         "architecture": {
