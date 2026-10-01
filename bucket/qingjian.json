@@ -42,7 +42,8 @@
         ]
     ],
     "checkver": {
-        "github": "https://github.com/qingjian-team/qingjian"
+        "github": "https://github.com/qingjian-team/qingjian",
+        "regex": "/releases/tag/(?:windows-v|v)([\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
