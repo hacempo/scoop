@@ -6,24 +6,26 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/qingjian-team/qingjian/releases/download/v0.1.4/qingjian-0.1.4-windows-x86_64-setup.exe",
-            "hash": "88dbcb5562628ad09bd710fa9117804d2d671970a465c06226ea719d276adafd"
+            "hash": "sha256:88dbcb5562628ad09bd710fa9117804d2d671970a465c06226ea719d276adafd"
         }
     },
     "installer": {
         "script": [
-            "Start-Process \"$dir\\qingjian-0.1.4-windows-x86_64-setup.exe\" -ArgumentList '/S', \"/D=$dir\" -Wait",
-            "Remove-Item \"$dir\\qingjian-0.1.4-windows-x86_64-setup.exe\" -Force"
+            "& $fname /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /DIR=\"$dir\""
         ]
     },
     "uninstaller": {
         "script": [
-            "if (Test-Path \"$dir\\uninstall.exe\") { Start-Process \"$dir\\uninstall.exe\" -ArgumentList '/S' -Wait }"
+            "$uninstaller = Join-Path $dir 'unins000.exe'",
+            "if (Test-Path $uninstaller) {",
+            "    & $uninstaller /VERYSILENT /SUPPRESSMSGBOXES /NORESTART",
+            "}"
         ]
     },
     "shortcuts": [
         [
-            "qingjian.exe",
-            "青简"
+            "qingjian-settings.exe",
+            "青简设置"
         ]
     ],
     "checkver": {
