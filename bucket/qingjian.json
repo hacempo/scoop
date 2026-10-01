@@ -41,7 +41,9 @@
             "青简设置"
         ]
     ],
-    "checkver": "github",
+    "checkver": {
+        "github": "https://github.com/qingjian-team/qingjian"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
