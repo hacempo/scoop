@@ -41,10 +41,7 @@
             "青简设置"
         ]
     ],
-    "checkver": {
-        "github": "https://github.com/qingjian-team/qingjian",
-        "regex": "/tag/v(?<version>[0-9.]+)"
-    },
+    "checkver": "github",
     "autoupdate": {
         "architecture": {
             "64bit": {
