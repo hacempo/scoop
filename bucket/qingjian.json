@@ -9,30 +9,7 @@
             "hash": "sha256:88dbcb5562628ad09bd710fa9117804d2d671970a465c06226ea719d276adafd"
         }
     },
-    "installer": {
-        "script": [
-            "Start-Process -FilePath \"$dir\\$fname\" -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/NOICONS', \"/DIR=$dir\") -Wait",
-            "if (-not (Test-Path (Join-Path $dir 'qingjian-server.exe'))) { throw '青简安装失败：未找到 qingjian-server.exe' }",
-            "Remove-Item (Join-Path $env:ProgramData 'Microsoft\\Windows\\Start Menu\\Programs\\Startup\\青简 Server.lnk') -Force -ErrorAction SilentlyContinue",
-            "Remove-Item (Join-Path $env:ProgramData 'Microsoft\\Windows\\Start Menu\\Programs\\青简') -Recurse -Force -ErrorAction SilentlyContinue",
-            "Remove-Item (Join-Path $dir 'unins000.exe') -Force -ErrorAction SilentlyContinue",
-            "Remove-Item (Join-Path $dir 'unins000.dat') -Force -ErrorAction SilentlyContinue",
-            "Remove-Item (Join-Path $dir 'unins000.msg') -Force -ErrorAction SilentlyContinue",
-            "Remove-Item (Join-Path $dir $fname) -Force -ErrorAction SilentlyContinue"
-        ]
-    },
-    "uninstaller": {
-        "script": [
-            "Get-Process -Name 'qingjian-server' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue",
-            "Get-Process -Name 'qingjian-settings' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue",
-            "$dll64 = Get-ChildItem $dir -Filter 'qingjian_tsf-*.dll' | Where-Object { $_.Name -notlike '*-x86.dll' }",
-            "$dll32 = Get-ChildItem $dir -Filter 'qingjian_tsf-*-x86.dll'",
-            "foreach ($dll in $dll64) { & $env:WINDIR\\System32\\regsvr32.exe /u /s $dll.FullName }",
-            "foreach ($dll in $dll32) { & $env:WINDIR\\SysWOW64\\regsvr32.exe /u /s $dll.FullName }",
-            "Remove-Item (Join-Path $env:APPDATA 'Microsoft\\Windows\\Start Menu\\Programs\\Startup\\青简 Server.lnk') -Force -ErrorAction SilentlyContinue",
-            "Remove-Item (Join-Path $env:ProgramData 'Microsoft\\Windows\\Start Menu\\Programs\\青简') -Recurse -Force -ErrorAction SilentlyContinue"
-        ]
-    },
+    "innosetup": true,
     "shortcuts": [
         [
             "qingjian-settings.exe",
