@@ -11,13 +11,14 @@
     },
     "installer": {
         "script": [
-            "& $fname /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /NOICONS /DIR=\"$dir\"",
+            "Start-Process -FilePath \"$dir\\$fname\" -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/NOICONS', \"/DIR=$dir\") -Wait",
             "if (-not (Test-Path (Join-Path $dir 'qingjian-server.exe'))) { throw '青简安装失败：未找到 qingjian-server.exe' }",
-            "Remove-Item (Join-Path $env:APPDATA 'Microsoft\\Windows\\Start Menu\\Programs\\Startup\\青简 Server.lnk') -Force -ErrorAction SilentlyContinue",
+            "Remove-Item (Join-Path $env:ProgramData 'Microsoft\\Windows\\Start Menu\\Programs\\Startup\\青简 Server.lnk') -Force -ErrorAction SilentlyContinue",
             "Remove-Item (Join-Path $env:ProgramData 'Microsoft\\Windows\\Start Menu\\Programs\\青简') -Recurse -Force -ErrorAction SilentlyContinue",
             "Remove-Item (Join-Path $dir 'unins000.exe') -Force -ErrorAction SilentlyContinue",
             "Remove-Item (Join-Path $dir 'unins000.dat') -Force -ErrorAction SilentlyContinue",
-            "Remove-Item (Join-Path $dir 'unins000.msg') -Force -ErrorAction SilentlyContinue"
+            "Remove-Item (Join-Path $dir 'unins000.msg') -Force -ErrorAction SilentlyContinue",
+            "Remove-Item (Join-Path $dir $fname) -Force -ErrorAction SilentlyContinue"
         ]
     },
     "uninstaller": {
