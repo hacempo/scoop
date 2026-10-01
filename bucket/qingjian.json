@@ -11,15 +11,28 @@
     },
     "installer": {
         "script": [
-            "& $fname /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /DIR=\"$dir\""
+            "7z x $fname -o\"$dir\" -y | Out-Null",
+            "if (-not (Test-Path (Join-Path $dir 'qingjian-server.exe'))) { throw '无法从安装包提取青简文件' }",
+            "Remove-Item (Join-Path $dir 'unins000.exe') -Force -ErrorAction SilentlyContinue",
+            "Remove-Item (Join-Path $dir '$PLUGINSDIR') -Recurse -Force -ErrorAction SilentlyContinue"
         ]
     },
+    "post_install": [
+        "$dll64 = Get-ChildItem $dir -Filter 'qingjian_tsf-*.dll' | Where-Object { $_.Name -notlike '*-x86.dll' } | Select-Object -First 1",
+        "$dll32 = Get-ChildItem $dir -Filter 'qingjian_tsf-*-x86.dll' | Select-Object -First 1",
+        "if (-not $dll64 -or -not $dll32) { throw '未找到青简 TSF DLL' }",
+        "& $env:WINDIR\System32\icacls.exe $dir /grant '*S-1-15-2-1:(OI)(CI)RX' /T /C /Q | Out-Null",
+        "& $env:WINDIR\System32\regsvr32.exe /s $dll64.FullName",
+        "& $env:WINDIR\SysWOW64\regsvr32.exe /s $dll32.FullName"
+    ],
     "uninstaller": {
         "script": [
-            "$uninstaller = Join-Path $dir 'unins000.exe'",
-            "if (Test-Path $uninstaller) {",
-            "    & $uninstaller /VERYSILENT /SUPPRESSMSGBOXES /NORESTART",
-            "}"
+            "Get-Process -Name 'qingjian-server' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue",
+            "Get-Process -Name 'qingjian-settings' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue",
+            "$dll64 = Get-ChildItem $dir -Filter 'qingjian_tsf-*.dll' | Where-Object { $_.Name -notlike '*-x86.dll' }",
+            "$dll32 = Get-ChildItem $dir -Filter 'qingjian_tsf-*-x86.dll'",
+            "foreach ($dll in $dll64) { & $env:WINDIR\System32\regsvr32.exe /u /s $dll.FullName }",
+            "foreach ($dll in $dll32) { & $env:WINDIR\SysWOW64\regsvr32.exe /u /s $dll.FullName }"
         ]
     },
     "shortcuts": [
