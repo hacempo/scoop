@@ -1,0 +1,66 @@
+{
+    "version": "1.0.56",
+    "description": "为 Windows 打造的现代文件管理器",
+    "homepage": "https://github.com/jimmgreen/pulse",
+    "license": "Apache-2.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/jimmgreen/pulse/releases/download/v1.0.56/Pulse-1.0.56-portable-win-x64.zip",
+            "hash": "8fa7998d9715eab4be0f53b3e39205abd7e14e4c890e3b5fd71ce9fbcb8c5e70"
+        }
+    },
+    "pre_install": [
+        "$subdir = Get-ChildItem -LiteralPath $dir -Directory | Where-Object { $_.Name -like 'Pulse-*-portable' } | Select-Object -First 1",
+        "if ($subdir) { Get-ChildItem -LiteralPath $subdir.FullName -Force | Move-Item -Destination $dir -Force; Remove-Item -LiteralPath $subdir.FullName -Recurse -Force }"
+    ],
+    "persist": [
+        "Pulse"
+    ],
+    "post_install": [
+        "$localData = Join-Path $env:LOCALAPPDATA 'Pulse'",
+        "$persistData = Join-Path $persist_dir 'Pulse'",
+        "New-Item -ItemType Directory -Path $persistData -Force | Out-Null",
+        "if (Test-Path -LiteralPath $localData) {",
+        "    $item = Get-Item -LiteralPath $localData -Force",
+        "    if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0) {",
+        "        & robocopy.exe $localData $persistData /E /COPY:DAT /DCOPY:DAT /R:1 /W:1 /XJ /NFL /NDL /NJH /NJS",
+        "        if ($LASTEXITCODE -ge 8) { throw 'Pulse 数据迁移失败；原目录已保留，请检查 robocopy 错误后重试。' }",
+        "        Remove-Item -LiteralPath $localData -Recurse -Force",
+        "    }",
+        "}",
+        "if (-not (Test-Path -LiteralPath $localData)) { New-Item -ItemType Junction -Path $localData -Target $persistData | Out-Null }"
+    ],
+    "pre_uninstall": [
+        "$localData = Join-Path $env:LOCALAPPDATA 'Pulse'",
+        "$persistData = Join-Path $persist_dir 'Pulse'",
+        "if (Test-Path -LiteralPath $localData) {",
+        "    $item = Get-Item -LiteralPath $localData -Force",
+        "    $target = $item.Target",
+        "    if ((($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -and $target) {",
+        "        if ([IO.Path]::GetFullPath($target).TrimEnd('\\') -ieq [IO.Path]::GetFullPath($persistData).TrimEnd('\\')) { Remove-Item -LiteralPath $localData -Force }",
+        "    }",
+        "}"
+    ],
+    "shortcuts": [
+        [
+            "pulse.exe",
+            "Pulse"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/jimmgreen/pulse",
+        "regex": "/releases/tag/v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/jimmgreen/pulse/releases/download/v$version/Pulse-$version-portable-win-x64.zip"
+            }
+        }
+    },
+    "notes": [
+        "使用官方免安装 ZIP，不会注册 PulseIndex 系统服务。",
+        "Pulse 的设置、缓存、日志和索引数据位于 %LOCALAPPDATA%\\Pulse；安装时会迁移到 Scoop persist，并建立目录联接。首次迁移可能因索引数据较大而耗时。",
+        "建议关闭应用内自动更新，后续通过 scoop update pulse 更新，避免应用内更新启动安装程序。"
+    ]
+}
