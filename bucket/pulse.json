@@ -35,7 +35,7 @@
         "$persistData = Join-Path $persist_dir 'Pulse'",
         "if (Test-Path -LiteralPath $localData) {",
         "    $item = Get-Item -LiteralPath $localData -Force",
-        "    $target = $item.Target",
+        "        if ([IO.Path]::GetFullPath($target).TrimEnd([char[]]@([char]92)) -ieq [IO.Path]::GetFullPath($persistData).TrimEnd([char[]]@([char]92))) { Remove-Item -LiteralPath $localData -Force }",
         "    if ((($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -and $target) {",
         "        if ([IO.Path]::GetFullPath($target).TrimEnd('\\') -ieq [IO.Path]::GetFullPath($persistData).TrimEnd('\\')) { Remove-Item -LiteralPath $localData -Force }",
         "    }",
