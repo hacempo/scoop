@@ -1,12 +1,12 @@
 {
-    "version": "2026.10.13-1603",
+    "version": "2026.10.17-428",
     "description": "番茄小说下载器",
     "homepage": "https://github.com/POf-L/Fanqie-novel-Downloader",
     "license": "Unknown",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/POf-L/Fanqie-novel-Downloader/releases/download/unsigned-v2026.10.13-1603-r738/FanqieNovelDownloader-tauri-windows-x64-portable.exe",
-            "hash": "83ca0062e8884e3c8477744d662cd6ab444034ecf82f2c9c7bdabba42949e638"
+            "url": "https://github.com/POf-L/Fanqie-novel-Downloader/releases/download/unsigned-v2026.10.17-428-r739/FanqieNovelDownloader-tauri-windows-x64-portable.exe",
+            "hash": "99b2c9447cac71ef9e1cbcc40d18cb6186b091e9883489464406f83d8a08fd01"
         }
     },
     "pre_install": "Rename-Item \"$dir\\FanqieNovelDownloader-tauri-windows-x64-portable.exe\" \"$dir\\FanqieNovelDownloader.exe\"",
