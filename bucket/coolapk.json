@@ -1,18 +1,20 @@
 {
-    "version": "1.35.0",
-    "description": "Unofficial Coolapk desktop client",
-    "homepage": "https://github.com/daimiaopeng/coolapk-desktop",
+    "version": "1.37.1",
+    "description": "Unofficial cross-platform Coolapk desktop client",
+    "homepage": "https://github.com/coolapk-desktop/coolapk-desktop",
     "license": "MIT",
-    "url": "https://github.com/daimiaopeng/coolapk-desktop/releases/download/v1.35.0/coolapk-desktop_1.35.0_x64-portable.exe#/coolapk-desktop.exe",
-    "hash": "f7af18d1e6c1ad25a0769ff7c626ee3fe346d9c20da182ce98d1f57cad739fc1",
+    "url": "https://github.com/coolapk-desktop/coolapk-desktop/releases/download/v1.37.1/coolapk-desktop_1.37.1_x64-portable.exe#/coolapk-desktop.exe",
+    "hash": "a2ac90e8b942f55ca5ca0bb870b26b10e4d5e9c894036b52ea0c15b0bb44b9cb",
     "shortcuts": [
         [
             "coolapk-desktop.exe",
             "Coolapk Desktop"
         ]
     ],
-    "checkver": "github",
+    "checkver": {
+        "github": "https://github.com/coolapk-desktop/coolapk-desktop"
+    },
     "autoupdate": {
-        "url": "https://github.com/daimiaopeng/coolapk-desktop/releases/download/v$version/coolapk-desktop_$version_x64-portable.exe#/coolapk-desktop.exe"
+        "url": "https://github.com/coolapk-desktop/coolapk-desktop/releases/download/v$version/coolapk-desktop_$version_x64-portable.exe#/coolapk-desktop.exe"
     }
 }
