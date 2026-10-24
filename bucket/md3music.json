@@ -1,0 +1,29 @@
+{
+    "version": "6.0.5",
+    "description": "A modern Material 3 music player built with Flutter and Rust",
+    "homepage": "https://github.com/zzyoxml/md3Music",
+    "license": "AGPL-3.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/zzyoxml/md3Music/releases/download/v6.0.5/md3music-windows-6.0.5.zip",
+            "hash": "8c17e6f6945d2533ec8e3fa49d0f571d245da133a2c3c7e086cbea6334c88f6c"
+        }
+    },
+    "shortcuts": [
+        [
+            "md3music.exe",
+            "MD3Music"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/zzyoxml/md3Music",
+        "regex": "/releases/tag/v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/zzyoxml/md3Music/releases/download/v$version/md3music-windows-$version.zip"
+            }
+        }
+    }
+}
