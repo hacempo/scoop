@@ -1,12 +1,12 @@
 {
-    "version": "7D0D6FE2",
+    "version": "26BEDEE8",
     "description": "Game translation and modification tool for players",
     "homepage": "https://mtool.app/",
     "license": {
         "identifier": "Proprietary",
         "url": "https://trs.mtool.app/tosen.html"
     },
-    "url": "https://apk.mtool.app/releases/MTool_7D0D6FE2.zip",
+    "url": "https://apk.mtool.app/releases/MTool_26BEDEE8.zip",
     "extract_dir": "MTool",
     "pre_install": [
         "if (!(Test-Path \"$persist_dir\\Tool\\fakeLocalStorage.json\")) {",
