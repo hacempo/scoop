@@ -1,10 +1,10 @@
 {
-    "version": "1.39.0",
+    "version": "1.39.1",
     "description": "Unofficial cross-platform Coolapk desktop client",
     "homepage": "https://github.com/coolapk-desktop/coolapk-desktop",
     "license": "MIT",
-    "url": "https://github.com/coolapk-desktop/coolapk-desktop/releases/download/v1.39.0/coolapk-desktop_1.39.0_x64-portable.exe#/coolapk-desktop.exe",
-    "hash": "3d09a897efbffc1a2398f46c34f50e3a9db05fec0e77b8310a471d950774b554",
+    "url": "https://github.com/coolapk-desktop/coolapk-desktop/releases/download/v1.39.1/coolapk-desktop_1.39.1_x64-portable.exe#/coolapk-desktop.exe",
+    "hash": "3b57c33676740e72df2d432995d3edcf81d2d50c6d9679561cd8d6e01c6abfe3",
     "shortcuts": [
         [
             "coolapk-desktop.exe",
