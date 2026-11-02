@@ -31,7 +31,11 @@
             "$signingCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($certificateFile.FullName)",
             "$trustedPeople = 'Cert:\\CurrentUser\\TrustedPeople'",
             "$trustedCertificate = Get-ChildItem -LiteralPath $trustedPeople | Where-Object { $_.Thumbprint -eq $signingCertificate.Thumbprint } | Select-Object -First 1",
-            "if (-not $trustedCertificate) { Import-Certificate -FilePath $certificateFile.FullName -CertStoreLocation $trustedPeople -ErrorAction Stop | Out-Null }",
+            "$certificateWasAdded = $false",
+            "if (-not $trustedCertificate) {",
+            "    Import-Certificate -FilePath $certificateFile.FullName -CertStoreLocation $trustedPeople -ErrorAction Stop | Out-Null",
+            "    $certificateWasAdded = $true",
+            "}",
             "$dependencyArchitecture = switch ($architecture) {",
             "    '64bit' { 'x64' }",
             "    '32bit' { 'x86' }",
@@ -42,8 +46,15 @@
             "if (-not (Test-Path -LiteralPath $dependencyDirectory)) { throw \"Screenbox dependencies for $architecture were not found.\" }",
             "$dependencies = @(Get-ChildItem -LiteralPath $dependencyDirectory -File -Recurse | Where-Object { $_.Extension -in '.appx', '.msix' } | Select-Object -ExpandProperty FullName)",
             "if ($dependencies.Count -eq 0) { throw \"No Screenbox dependency packages were found for $architecture.\" }",
-            "Add-AppxPackage -Path $bundle.FullName -DependencyPath $dependencies -ForceApplicationShutdown -ErrorAction Stop",
-            "Get-ChildItem -LiteralPath $trustedPeople | Where-Object { $_.Subject -eq $signingCertificate.Subject -and $_.Thumbprint -ne $signingCertificate.Thumbprint } | Remove-Item -ErrorAction Stop"
+            "try {",
+            "    Add-AppxPackage -Path $bundle.FullName -DependencyPath $dependencies -ForceApplicationShutdown -ErrorAction Stop",
+            "} catch {",
+            "    if ($certificateWasAdded) {",
+            "        Get-ChildItem -LiteralPath $trustedPeople | Where-Object { $_.Thumbprint -eq $signingCertificate.Thumbprint } | Remove-Item -ErrorAction SilentlyContinue",
+            "    }",
+            "    throw",
+            "}",
+            "Get-ChildItem -LiteralPath $trustedPeople | Where-Object { $_.Subject -eq $signingCertificate.Subject -and $_.Thumbprint -ne $signingCertificate.Thumbprint } | Remove-Item -ErrorAction SilentlyContinue"
         ]
     },
     "uninstaller": {
