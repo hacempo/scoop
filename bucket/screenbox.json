@@ -1,0 +1,66 @@
+{
+    "version": "0.24.0",
+    "description": "A LibVLC-based media player for Windows with video and music browsing",
+    "homepage": "https://github.com/huynhsontung/Screenbox",
+    "license": "GPL-3.0-only",
+    "notes": "Installs the signed MSIX bundle for the current Windows user. The bundled signing certificate is imported into the CurrentUser\\TrustedPeople certificate store.",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/huynhsontung/Screenbox/releases/download/v0.24.0/Screenbox-sideload.zip",
+            "hash": "bc0ec402830121a3bcc20b00192cc624d0732c3165ca8e240e0b97121ee52bc3"
+        },
+        "32bit": {
+            "url": "https://github.com/huynhsontung/Screenbox/releases/download/v0.24.0/Screenbox-sideload.zip",
+            "hash": "bc0ec402830121a3bcc20b00192cc624d0732c3165ca8e240e0b97121ee52bc3"
+        },
+        "arm64": {
+            "url": "https://github.com/huynhsontung/Screenbox/releases/download/v0.24.0/Screenbox-sideload.zip",
+            "hash": "bc0ec402830121a3bcc20b00192cc624d0732c3165ca8e240e0b97121ee52bc3"
+        }
+    },
+    "installer": {
+        "script": [
+            "$bundle = Get-ChildItem -LiteralPath $dir -Filter '*.msixbundle' -File | Select-Object -First 1",
+            "if (-not $bundle) { throw 'Screenbox MSIX bundle was not found in the sideload install kit.' }",
+            "$certificate = Get-ChildItem -LiteralPath $dir -Filter '*.cer' -File | Select-Object -First 1",
+            "if (-not $certificate) { throw 'Screenbox signing certificate was not found in the sideload install kit.' }",
+            "Import-Certificate -FilePath $certificate.FullName -CertStoreLocation 'Cert:\\CurrentUser\\TrustedPeople' | Out-Null",
+            "$dependencyArchitecture = switch ($architecture) {",
+            "    '64bit' { 'x64' }",
+            "    '32bit' { 'x86' }",
+            "    'arm64' { 'ARM64' }",
+            "    default { throw \"Unsupported architecture: $architecture\" }",
+            "}",
+            "$dependencyDirectory = Join-Path $dir \"Dependencies\\$dependencyArchitecture\"",
+            "if (-not (Test-Path -LiteralPath $dependencyDirectory)) { throw \"Screenbox dependencies for $architecture were not found.\" }",
+            "$dependencies = @(Get-ChildItem -LiteralPath $dependencyDirectory -File | Where-Object { $_.Extension -in '.appx', '.msix' } | Select-Object -ExpandProperty FullName)",
+            "if ($dependencies.Count -eq 0) { throw \"No Screenbox dependency packages were found for $architecture.\" }",
+            "Add-AppxPackage -Path $bundle.FullName -DependencyPath $dependencies -ForceApplicationShutdown"
+        ]
+    },
+    "uninstaller": {
+        "script": [
+            "Get-AppxPackage -Name '18496Starpine.Screenbox' | Remove-AppxPackage"
+        ]
+    },
+    "checkver": {
+        "github": "https://github.com/huynhsontung/Screenbox"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/huynhsontung/Screenbox/releases/download/v$version/Screenbox-sideload.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/huynhsontung/Screenbox/releases/download/v$version/Screenbox-sideload.zip"
+            },
+            "arm64": {
+                "url": "https://github.com/huynhsontung/Screenbox/releases/download/v$version/Screenbox-sideload.zip"
+            }
+        },
+        "hash": {
+            "url": "https://api.github.com/repos/huynhsontung/Screenbox/releases/tags/v$version",
+            "regex": "\"name\":\\s*\"Screenbox-sideload\\.zip\"[\\s\\S]*?\"digest\":\\s*\"sha256:([0-9a-f]{64})\""
+        }
+    }
+}
