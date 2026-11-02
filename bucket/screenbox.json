@@ -4,98 +4,26 @@
     "homepage": "https://github.com/huynhsontung/Screenbox",
     "license": "GPL-3.0-only",
     "notes": [
-        "Uses the upstream self-signed MSIX sideload bundle and installs it for the current Windows user with Add-AppxPackage.",
-        "The bundled signing certificate is trusted in CurrentUser\\TrustedPeople; this per-user trust step does not require machine-wide certificate changes.",
-        "Framework dependencies are installed together with the app in a Windows PowerShell 5.1 helper process to avoid the PowerShell 7 Add-AppxPackage -DependencyPath array bug."
+        "Downloads the official x64-compatible MSIX bundle directly; no sideload ZIP or development certificate is used.",
+        "The package is opened with Windows App Installer. Confirm the Install button in its window to complete installation."
     ],
     "architecture": {
         "64bit": {
-            "url": "https://github.com/huynhsontung/Screenbox/releases/download/v0.24.0/Screenbox-sideload.zip",
-            "hash": "bc0ec402830121a3bcc20b00192cc624d0732c3165ca8e240e0b97121ee52bc3"
-        },
-        "32bit": {
-            "url": "https://github.com/huynhsontung/Screenbox/releases/download/v0.24.0/Screenbox-sideload.zip",
-            "hash": "bc0ec402830121a3bcc20b00192cc624d0732c3165ca8e240e0b97121ee52bc3"
-        },
-        "arm64": {
-            "url": "https://github.com/huynhsontung/Screenbox/releases/download/v0.24.0/Screenbox-sideload.zip",
-            "hash": "bc0ec402830121a3bcc20b00192cc624d0732c3165ca8e240e0b97121ee52bc3"
+            "url": "https://github.com/huynhsontung/Screenbox/releases/download/v0.24.0/Screenbox_0.24.0.0_neutral.msixbundle",
+            "hash": "6d6f03595120d6ee1042e8e7550ee2adfa3c3c6b51becbcbf454db08aee0d5cf"
         }
     },
     "installer": {
         "script": [
             "$bundle = Get-ChildItem -LiteralPath $dir -Filter '*.msixbundle' -File | Select-Object -First 1",
-            "if (-not $bundle) { throw 'Screenbox MSIX bundle was not found in the sideload install kit.' }",
-            "$certificateFile = Get-ChildItem -LiteralPath $dir -Filter '*.cer' -File | Select-Object -First 1",
-            "if (-not $certificateFile) { throw 'Screenbox signing certificate was not found in the sideload install kit.' }",
-            "$dependencyArchitecture = switch ($architecture) {",
-            "    '64bit' { 'x64' }",
-            "    '32bit' { 'x86' }",
-            "    'arm64' { 'ARM64' }",
-            "    default { throw \"Unsupported architecture: $architecture\" }",
-            "}",
-            "$dependencyDirectory = Join-Path $dir \"Dependencies\\$dependencyArchitecture\"",
-            "if (-not (Test-Path -LiteralPath $dependencyDirectory -PathType Container)) { throw \"Screenbox dependencies for $architecture were not found at '$dependencyDirectory'. Check the sideload ZIP contents.\" }",
-            "$dependencyPackages = @(Get-ChildItem -LiteralPath $dependencyDirectory -File -Recurse | Where-Object { $_.Extension -in '.appx', '.msix' } | Sort-Object { if ($_.Name -like 'Microsoft.VCLibs*') { 0 } elseif ($_.Name -like 'Microsoft.UI.Xaml*') { 1 } else { 2 } })",
-            "if ($dependencyPackages.Count -ne 2) { throw \"Expected the two Screenbox framework dependency packages under '$dependencyDirectory', but found $($dependencyPackages.Count).\" }",
-            "$dependencyPaths = @($dependencyPackages | ForEach-Object { $_.FullName })",
-            "foreach ($dependencyPath in $dependencyPaths) { if (-not (Test-Path -LiteralPath $dependencyPath -PathType Leaf)) { throw \"Screenbox dependency file was not found: $dependencyPath\" } }",
-            "$workerScriptPath = Join-Path $env:TEMP ('screenbox-install-' + [guid]::NewGuid().ToString('N') + '.ps1')",
-            "$configPath = Join-Path $env:TEMP ('screenbox-install-' + [guid]::NewGuid().ToString('N') + '.json')",
-            "$stdoutPath = Join-Path $env:TEMP ('screenbox-install-' + [guid]::NewGuid().ToString('N') + '.out')",
-            "$stderrPath = Join-Path $env:TEMP ('screenbox-install-' + [guid]::NewGuid().ToString('N') + '.err')",
-            "$workerScript = @'",
-            "param([Parameter(Mandatory = $true)][string]$ConfigPath)",
-            "$ErrorActionPreference = 'Stop'",
-            "$config = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json",
-            "$trustedPeople = 'Cert:\\CurrentUser\\TrustedPeople'",
-            "$signingCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($config.Certificate)",
-            "$trustedCertificate = Get-ChildItem -LiteralPath $trustedPeople | Where-Object { $_.Thumbprint -eq $signingCertificate.Thumbprint } | Select-Object -First 1",
-            "$certificateWasAdded = $false",
-            "try {",
-            "    if (-not $trustedCertificate) {",
-            "        Import-Certificate -FilePath $config.Certificate -CertStoreLocation $trustedPeople -ErrorAction Stop | Out-Null",
-            "        $certificateWasAdded = $true",
-            "    }",
-            "    Add-AppxPackage -Path $config.Bundle -DependencyPath ([string[]]$config.Dependencies) -ForceApplicationShutdown -ErrorAction Stop",
-            "} catch {",
-            "    if ($certificateWasAdded) {",
-            "        Get-ChildItem -LiteralPath $trustedPeople | Where-Object { $_.Thumbprint -eq $signingCertificate.Thumbprint } | Remove-Item -ErrorAction SilentlyContinue",
-            "    }",
-            "    [Console]::Error.WriteLine(($_ | Out-String))",
-            "    exit 1",
-            "}",
-            "Get-ChildItem -LiteralPath $trustedPeople | Where-Object { $_.Subject -eq $signingCertificate.Subject -and $_.Thumbprint -ne $signingCertificate.Thumbprint } | Remove-Item -ErrorAction SilentlyContinue",
-            "exit 0",
-            "'@",
-            "$windowsPowerShell = Join-Path $env:WINDIR 'System32\\WindowsPowerShell\\v1.0\\powershell.exe'",
-            "if (-not (Test-Path -LiteralPath $windowsPowerShell -PathType Leaf)) { throw 'Windows PowerShell 5.1 could not be found; cannot safely deploy the Screenbox MSIX dependencies.' }",
-            "$installConfig = @{ Bundle = $bundle.FullName; Certificate = $certificateFile.FullName; Dependencies = $dependencyPaths }",
-            "Set-Content -LiteralPath $workerScriptPath -Value $workerScript -Encoding UTF8",
-            "$installConfig | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath $configPath -Encoding UTF8",
-            "try {",
-            "    $arguments = '-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"{0}\" -ConfigPath \"{1}\"' -f $workerScriptPath, $configPath",
-            "    $process = Start-Process -FilePath $windowsPowerShell -ArgumentList $arguments -Wait -PassThru -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath",
-            "    if ($process.ExitCode -ne 0) {",
-            "        $errorOutput = if (Test-Path -LiteralPath $stderrPath) { Get-Content -LiteralPath $stderrPath -Raw } else { '' }",
-            "        $standardOutput = if (Test-Path -LiteralPath $stdoutPath) { Get-Content -LiteralPath $stdoutPath -Raw } else { '' }",
-            "        throw \"Screenbox MSIX deployment failed in Windows PowerShell 5.1 (exit code $($process.ExitCode)).`n$errorOutput`n$standardOutput\"",
-            "    }",
-            "} finally {",
-            "    Remove-Item -LiteralPath $workerScriptPath, $configPath, $stdoutPath, $stderrPath -Force -ErrorAction SilentlyContinue",
-            "Write-Host 'Installing Screenbox and its framework dependencies in a separate Windows PowerShell 5.1 process...'",
-            "}"
+            "if (-not $bundle) { throw 'Screenbox MSIX bundle was not found.' }",
+            "Start-Process -FilePath $bundle.FullName -Wait -ErrorAction Stop"
         ]
     },
     "uninstaller": {
         "script": [
             "$package = Get-AppxPackage -Name '18496Starpine.Screenbox'",
-            "if ($package) { $package | Remove-AppxPackage -ErrorAction Stop }",
-            "$certificateFile = Get-ChildItem -LiteralPath $dir -Filter '*.cer' -File | Select-Object -First 1",
-            "if ($certificateFile) {",
-            "    $signingCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($certificateFile.FullName)",
-            "    Get-ChildItem -LiteralPath 'Cert:\\CurrentUser\\TrustedPeople' | Where-Object { $_.Subject -eq $signingCertificate.Subject } | Remove-Item -ErrorAction Stop",
-            "}"
+            "if ($package) { $package | Remove-AppxPackage -ErrorAction Stop }"
         ]
     },
     "checkver": {
@@ -104,18 +32,12 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/huynhsontung/Screenbox/releases/download/v$version/Screenbox-sideload.zip"
-            },
-            "32bit": {
-                "url": "https://github.com/huynhsontung/Screenbox/releases/download/v$version/Screenbox-sideload.zip"
-            },
-            "arm64": {
-                "url": "https://github.com/huynhsontung/Screenbox/releases/download/v$version/Screenbox-sideload.zip"
+                "url": "https://github.com/huynhsontung/Screenbox/releases/download/v$version/Screenbox_$version.0_neutral.msixbundle"
             }
         },
         "hash": {
             "url": "https://api.github.com/repos/huynhsontung/Screenbox/releases/tags/v$version",
-            "regex": "\"name\":\\s*\"Screenbox-sideload\\.zip\"[\\s\\S]*?\"digest\":\\s*\"sha256:([0-9a-f]{64})\""
+            "regex": "\"name\":\\s*\"Screenbox_$version\\.0_neutral\\.msixbundle\"[\\s\\S]*?\"digest\":\\s*\"sha256:([0-9a-f]{64})\""
         }
     }
 }
