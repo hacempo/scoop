@@ -49,7 +49,7 @@
             "$ErrorActionPreference = 'Stop'",
             "$config = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json",
             "$trustedPeople = 'Cert:\\CurrentUser\\TrustedPeople'",
-            "$signingCertificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($config.Certificate)",
+            "$signingCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($config.Certificate)",
             "$trustedCertificate = Get-ChildItem -LiteralPath $trustedPeople | Where-Object { $_.Thumbprint -eq $signingCertificate.Thumbprint } | Select-Object -First 1",
             "$certificateWasAdded = $false",
             "try {",
@@ -83,6 +83,7 @@
             "    }",
             "} finally {",
             "    Remove-Item -LiteralPath $workerScriptPath, $configPath, $stdoutPath, $stderrPath -Force -ErrorAction SilentlyContinue",
+            "Write-Host 'Installing Screenbox and its framework dependencies in a separate Windows PowerShell 5.1 process...'",
             "}"
         ]
     },
