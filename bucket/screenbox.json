@@ -37,7 +37,7 @@
         },
         "hash": {
             "url": "https://api.github.com/repos/huynhsontung/Screenbox/releases/tags/v$version",
-            "regex": "\"name\":\\s*\"Screenbox_$version\\.0_neutral\\.msixbundle\"[\\s\\S]*?\"digest\":\\s*\"sha256:([0-9a-f]{64})\""
+            "regex": "\"name\":\\s*\"Screenbox_[0-9]+\\.[0-9]+\\.[0-9]+\\.0_neutral\\.msixbundle\"[\\s\\S]*?\"digest\":\\s*\"sha256:([0-9a-f]{64})\""
         }
     }
 }
