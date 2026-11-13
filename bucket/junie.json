@@ -1,0 +1,42 @@
+{
+    "$schema": "https://raw.githubusercontent.com/ScoopInstaller/Scoop/master/schema.json",
+    "version": "4020.10",
+    "description": "Junie CLI - JetBrains agentic coding tool with an interactive terminal interface for reviewing, writing and modifying code",
+    "homepage": "https://junie.jetbrains.com/docs/junie-cli.html",
+    "license": "Proprietary",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/JetBrains/junie/releases/download/4020.10/junie-release-4020.10-windows-amd64.zip",
+            "hash": "3535e133daea7614e6db09fb1e6793dfb235f5419e8fce60e1f6476dd4bddcf7"
+        },
+        "arm64": {
+            "url": "https://github.com/JetBrains/junie/releases/download/4020.10/junie-release-4020.10-windows-aarch64.zip",
+            "hash": "6773966377a989fb17d6941e1afdf5a4e6cad69930bf76f0882bfea2c6dfc501"
+        }
+    },
+    "extract_dir": "junie",
+    "bin": "junie.exe",
+    "checkver": {
+        "url": "https://raw.githubusercontent.com/JetBrains/junie/main/update-info.jsonl",
+        "regex": "\"version\":\"([\\d.]+)\"[^\\r\\n]*\"platform\":\"windows-amd64\"",
+        "reverse": true
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/JetBrains/junie/releases/download/$version/junie-release-$version-windows-amd64.zip",
+                "hash": {
+                    "url": "https://raw.githubusercontent.com/JetBrains/junie/main/update-info.jsonl",
+                    "regex": "\"version\":\"$version\"[^\\r\\n]*\"platform\":\"windows-amd64\"[^\\r\\n]*\"sha256\":\"$sha256\""
+                }
+            },
+            "arm64": {
+                "url": "https://github.com/JetBrains/junie/releases/download/$version/junie-release-$version-windows-aarch64.zip",
+                "hash": {
+                    "url": "https://raw.githubusercontent.com/JetBrains/junie/main/update-info.jsonl",
+                    "regex": "\"version\":\"$version\"[^\\r\\n]*\"platform\":\"windows-aarch64\"[^\\r\\n]*\"sha256\":\"$sha256\""
+                }
+            }
+        }
+    }
+}
