@@ -6,7 +6,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/appshubcc/Bettbox/releases/download/v1.19.8/Bettbox-1.19.8-windows-amd64-compatible-portable.zip",
-            "hash": "14359a001dba8b2a6a0b007d60bbf9393546497d6f6212e8ee724369a379f303"
+            "hash": "50c0fdab6416b6734b473a3691e6f18f7e59e028e80a092fbeaaa4a1a0289b9e"
         }
     },
     "extract_dir": "Bettbox",
