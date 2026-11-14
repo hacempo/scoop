@@ -1,0 +1,48 @@
+name: Hash Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Check for upstream asset replacements even when the version is unchanged.
+    - cron: '0 3 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  check-hashes:
+    name: Check and repair manifest hashes
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # This action installs/configures Scoop and exposes SCOOP_HOME.
+      - name: Setup Scoop
+        uses: ScoopInstaller/GithubActions@5bceeda181721d9d10a18fdcc3ddca6f33467ae6 # v3.0.0
+        env:
+          SKIP_UPDATED: 1
+
+      - name: Check and update hashes
+        shell: pwsh
+        run: |
+          & "$env:SCOOP_HOME\bin\checkhashes.ps1" -Dir "$env:GITHUB_WORKSPACE\bucket" -Update -SkipCorrect
+          if ($LASTEXITCODE -ne 0) {
+            throw "Scoop hash check failed."
+          }
+
+      - name: Commit hash repairs
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bucket
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "Fix manifest hashes"
+            if ($LASTEXITCODE -ne 0) { throw "Failed to commit hash repairs." }
+            git push
+            if ($LASTEXITCODE -ne 0) { throw "Failed to push hash repairs." }
+          } else {
+            Write-Host "All manifest hashes are up to date."
+          }
