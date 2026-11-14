@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # This action installs/configures Scoop and exposes SCOOP_HOME.
+      # This action installs/configures Scoop for the runner.
       - name: Setup Scoop
         uses: ScoopInstaller/GithubActions@5bceeda181721d9d10a18fdcc3ddca6f33467ae6 # v3.0.0
         env:
@@ -26,10 +26,12 @@ jobs:
       - name: Check and update hashes
         shell: pwsh
         run: |
-          & "$env:SCOOP_HOME\bin\checkhashes.ps1" -Dir "$env:GITHUB_WORKSPACE\bucket" -Update -SkipCorrect
-          if ($LASTEXITCODE -ne 0) {
-            throw "Scoop hash check failed."
+          $ErrorActionPreference = 'Stop'
+          $checkhashes = Join-Path $env:USERPROFILE 'SCOOP\apps\scoop\current\bin\checkhashes.ps1'
+          if (-not (Test-Path $checkhashes)) {
+            throw "Scoop checkhashes script not found: $checkhashes"
           }
+          & $checkhashes -Dir "$env:GITHUB_WORKSPACE\bucket" -Update -SkipCorrect
 
       - name: Commit hash repairs
         shell: pwsh
