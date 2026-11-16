@@ -1,6 +1,6 @@
 param(
-    # overwrite upstream param
-    [String]$upstream = "<username>/<bucketname>:main"
+    # upstream repository and target branch
+    [String]$upstream = "hacempo/scoop:master"
 )
 
 if (!$env:SCOOP_HOME) { $env:SCOOP_HOME = Convert-Path (scoop prefix scoop) }
