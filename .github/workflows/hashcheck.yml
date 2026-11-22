@@ -68,9 +68,9 @@ jobs:
             $data = Read-Manifest -Path $Path
             $state = [ordered]@{}
 
-            if ($data.ContainsKey('url')) {
+            if (($null -ne $data.url)) {
               $state['root'] = @($data.hash)
-            } elseif ($data.ContainsKey('architecture')) {
+            } elseif (($null -ne $data.architecture)) {
               foreach ($archName in $data.architecture.Keys) {
                 $state[$archName] = @($data.architecture[$archName].hash)
               }
@@ -84,7 +84,7 @@ jobs:
             $data = Read-Manifest -Path $Path
 
             if ($data.ContainsKey('url')) {
-              if (-not $data.ContainsKey('hash') -or $null -eq $data.hash) {
+              if (-not ($null -ne $data.hash) -or $null -eq $data.hash) {
                 throw 'Top-level url exists but top-level hash is missing.'
               }
               $urls = @($data.url)
