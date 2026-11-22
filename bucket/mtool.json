@@ -7,6 +7,7 @@
         "url": "https://trs.mtool.app/tosen.html"
     },
     "url": "https://apk.mtool.app/releases/MTool_D2D39D88.zip",
+    "hash": "1c8936f069bec6cde031bff62bb2d64f52fa544d9d4f892afed36a8f8de31419",
     "extract_dir": "MTool",
     "pre_install": [
         "if (!(Test-Path \"$persist_dir\\Tool\\fakeLocalStorage.json\")) {",
