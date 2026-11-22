@@ -43,6 +43,7 @@ jobs:
 
           foreach ($manifest in $manifests) {
             Write-Host "::group::Hash check: $($manifest.BaseName)"
+            $Error.Clear()
             try {
               & $checkhashes -App $manifest.BaseName -Dir $bucketDir -Update -SkipCorrect
               if ($Error.Count -gt 0) {
@@ -62,6 +63,7 @@ jobs:
           "Checked $($manifests.Count) manifests." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           if ($failures.Count -gt 0) {
             $failures | ForEach-Object { "- $_" } | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            throw "$($failures.Count) manifest hash check(s) failed. See the summary above."
           }
 
       - name: Commit hash repairs
