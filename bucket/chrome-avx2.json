@@ -6,7 +6,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/RobRich999/Chromium_Clang/releases/download/v159.0.8136.0-r1732321-win64-avx2/chrome.zip",
-            "hash": "6f9cf7ba25a738489949d600ba4e9313d8c9c4214a9ae99fcc9b417c1a6a9de2"
+            "hash": "6d1b30dceb8b88b21e4f0a444e3f53a1e312bc3d8248fff625ef329de1baf02b"
         }
     },
     "extract_dir": "chrome-win32",
@@ -17,8 +17,8 @@
         ]
     ],
     "checkver": {
-        "github": "https://github.com/RobRich999/Chromium_Clang",
-        "regex": "v([\\d.]+-r\\d+)-win64-avx2"
+        "url": "https://api.github.com/repos/RobRich999/Chromium_Clang/releases?per_page=30",
+        "regex": "\"tag_name\":\\s*\"v([\\d.]+-r\\d+)-win64-avx2\""
     },
     "autoupdate": {
         "architecture": {
