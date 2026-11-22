@@ -6,7 +6,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/qingjian-team/qingjian/releases/download/windows-v0.3.5/qingjian-0.3.5-windows-x86_64-setup.exe",
-            "hash": "sha256:6b7252c0dc6d9e3c5080698829cc7ece07e11f4198b60fc0565405be010fdabe"
+            "hash": "6b7252c0dc6d9e3c5080698829cc7ece07e11f4198b60fc0565405be010fdabe"
         }
     },
     "innosetup": true,
