@@ -1,12 +1,12 @@
 {
-    "version": "0.1.4",
+    "version": "0.3.5",
     "description": "跨平台中文输入法",
     "homepage": "https://github.com/qingjian-team/qingjian",
     "license": "GPL-3.0-or-later",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/qingjian-team/qingjian/releases/download/v0.1.4/qingjian-0.1.4-windows-x86_64-setup.exe",
-            "hash": "sha256:88dbcb5562628ad09bd710fa9117804d2d671970a465c06226ea719d276adafd"
+            "url": "https://github.com/qingjian-team/qingjian/releases/download/windows-v0.3.5/qingjian-0.3.5-windows-x86_64-setup.exe",
+            "hash": "sha256:6b7252c0dc6d9e3c5080698829cc7ece07e11f4198b60fc0565405be010fdabe"
         }
     },
     "innosetup": true,
@@ -18,12 +18,12 @@
     ],
     "checkver": {
         "github": "https://github.com/qingjian-team/qingjian",
-        "regex": "/releases/tag/(?:windows-v|v)([\\d.]+)"
+        "regex": "\"tag_name\":\\s*\"windows-v([\\d.]+)\""
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/qingjian-team/qingjian/releases/download/v$version/qingjian-$version-windows-x86_64-setup.exe"
+                "url": "https://github.com/qingjian-team/qingjian/releases/download/windows-v$version/qingjian-$version-windows-x86_64-setup.exe"
             }
         }
     }
