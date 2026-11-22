@@ -1,12 +1,12 @@
 {
-    "version": "1.6.1",
+    "version": "1.7.3",
     "description": "A tool to find subtitles for movies and TV shows",
     "homepage": "https://github.com/daoran9/subtitle-finder",
     "license": "Unknown",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/daoran9/subtitle-finder/releases/download/v1.6.1/SubtitleFinder.1.6.1.exe",
-            "hash": "6fe8a618c9a1cb515fadc2995b3a2cd40483c390f81e620e14c46a4b8cf75ba6"
+            "url": "https://github.com/daoran9/subtitle-finder/releases/download/v1.7.3/SubtitleFinder.1.7.3.exe",
+            "hash": "79159cc1f13218f4ec7f9f4e4576a2b341763e637093c86168d5462606d921b6"
         }
     },
     "pre_install": "Rename-Item \"$dir\\SubtitleFinder.$version.exe\" \"$dir\\SubtitleFinder.exe\"",
@@ -19,7 +19,7 @@
     ],
     "checkver": {
         "github": "https://github.com/daoran9/subtitle-finder",
-        "regex": "/releases/tag/v([\\d.]+)"
+        "regex": "\"tag_name\":\\s*\"v([\\d.]+)\""
     },
     "autoupdate": {
         "architecture": {
