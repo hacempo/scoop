@@ -2,6 +2,13 @@ name: Hash Check
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'bucket/**'
+      - '.github/workflows/hashcheck.yml'
   schedule:
     # Check for upstream asset replacements even when the version is unchanged.
     - cron: '0 3 * * *'
@@ -19,35 +26,133 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 90
     steps:
-      - name: Checkout
+      - name: Checkout bucket
+        id: checkout-bucket
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
 
-      - name: Setup Scoop
-        uses: ScoopInstaller/GithubActions@5bceeda181721d9d10a18fdcc3ddca6f33467ae6 # v3.0.0
-        env:
-          SKIP_UPDATED: 1
+      # Do not use ScoopInstaller/GithubActions here: that action runs Excavator.
+      # Hash Check must validate assets only and must not run checkver/autoupdate.
+      - name: Checkout Scoop core
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ScoopInstaller/Scoop
+          ref: v0.6.0
+          path: scoop-core
+          persist-credentials: false
 
-      - name: Check and update hashes
+      - name: Check and repair hashes
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $bucketDir = Join-Path $env:GITHUB_WORKSPACE 'bucket'
-          $checkhashes = Join-Path $env:USERPROFILE 'SCOOP\apps\scoop\current\bin\checkhashes.ps1'
+          $checkhashes = Join-Path $env:GITHUB_WORKSPACE 'scoop-core\bin\checkhashes.ps1'
 
           if (-not (Test-Path -LiteralPath $checkhashes -PathType Leaf)) {
             throw "Scoop checkhashes script not found: $checkhashes"
           }
 
+          # Give Scoop an isolated root/cache; do not install or update Scoop on the runner.
+          $env:SCOOP = Join-Path $env:RUNNER_TEMP 'scoop-hashcheck-root'
+          $env:SCOOP_CACHE = Join-Path $env:RUNNER_TEMP 'scoop-hashcheck-cache'
+          New-Item -ItemType Directory -Force -Path $env:SCOOP, $env:SCOOP_CACHE | Out-Null
+
+          function Read-Manifest {
+            param([Parameter(Mandatory = $true)][string]$Path)
+            Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json -AsHashtable
+          }
+
+          function Get-HashState {
+            param([Parameter(Mandatory = $true)][string]$Path)
+            $data = Read-Manifest -Path $Path
+            $state = [ordered]@{}
+
+            if ($data.ContainsKey('url')) {
+              $state['root'] = @($data.hash)
+            } elseif ($data.ContainsKey('architecture')) {
+              foreach ($archName in $data.architecture.Keys) {
+                $state[$archName] = @($data.architecture[$archName].hash)
+              }
+            }
+
+            ConvertTo-Json -InputObject $state -Depth 20 -Compress
+          }
+
+          function Assert-ManifestHashLayout {
+            param([Parameter(Mandatory = $true)][string]$Path)
+            $data = Read-Manifest -Path $Path
+
+            if ($data.ContainsKey('url')) {
+              if (-not $data.ContainsKey('hash') -or $null -eq $data.hash) {
+                throw 'Top-level url exists but top-level hash is missing.'
+              }
+              $urls = @($data.url)
+              $hashes = @($data.hash)
+              if ($urls.Count -eq 0 -or $urls.Count -ne $hashes.Count) {
+                throw "Top-level URL/hash count mismatch (URLs=$($urls.Count), hashes=$($hashes.Count))."
+              }
+              for ($i = 0; $i -lt $urls.Count; $i++) {
+                if ([string]::IsNullOrWhiteSpace([string]$urls[$i]) -or [string]::IsNullOrWhiteSpace([string]$hashes[$i])) {
+                  throw "Top-level URL/hash entry $i is empty."
+                }
+              }
+              return
+            }
+
+            if (-not $data.ContainsKey('architecture') -or $data.architecture.Count -eq 0) {
+              throw 'Manifest has neither a top-level URL nor architecture URLs.'
+            }
+
+            foreach ($archName in $data.architecture.Keys) {
+              $arch = $data.architecture[$archName]
+              if ($null -eq $arch.url -or $null -eq $arch.hash) {
+                throw "Architecture '$archName' must define both url and hash."
+              }
+              $urls = @($arch.url)
+              $hashes = @($arch.hash)
+              if ($urls.Count -eq 0 -or $urls.Count -ne $hashes.Count) {
+                throw "Architecture '$archName' URL/hash count mismatch (URLs=$($urls.Count), hashes=$($hashes.Count))."
+              }
+              for ($i = 0; $i -lt $urls.Count; $i++) {
+                if ([string]::IsNullOrWhiteSpace([string]$urls[$i]) -or [string]::IsNullOrWhiteSpace([string]$hashes[$i])) {
+                  throw "Architecture '$archName' URL/hash entry $i is empty."
+                }
+              }
+            }
+          }
+
           $failures = [System.Collections.Generic.List[string]]::new()
+          $repairs = [System.Collections.Generic.List[string]]::new()
           $manifests = Get-ChildItem -LiteralPath $bucketDir -Filter '*.json' -File | Sort-Object Name
 
           foreach ($manifest in $manifests) {
             Write-Host "::group::Hash check: $($manifest.BaseName)"
-            $Error.Clear()
+            $tempDir = Join-Path $env:RUNNER_TEMP ("hashcheck-" + $manifest.BaseName)
             try {
-              & $checkhashes -App $manifest.BaseName -Dir $bucketDir -Update -SkipCorrect
+              Assert-ManifestHashLayout -Path $manifest.FullName
+              $before = Get-HashState -Path $manifest.FullName
+
+              if (Test-Path -LiteralPath $tempDir) {
+                Remove-Item -LiteralPath $tempDir -Recurse -Force
+              }
+              New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
+              $tempManifest = Join-Path $tempDir $manifest.Name
+              Copy-Item -LiteralPath $manifest.FullName -Destination $tempManifest
+
+              $Error.Clear()
+              & $checkhashes -App $manifest.BaseName -Dir $tempDir -Update -SkipCorrect
               if ($Error.Count -gt 0) {
-                throw "PowerShell reported an error while checking $($manifest.Name)."
+                throw "Scoop reported a PowerShell error: $($Error[0].Exception.Message)"
+              }
+
+              $after = Get-HashState -Path $tempManifest
+              if ($before -ne $after) {
+                Copy-Item -LiteralPath $tempManifest -Destination $manifest.FullName -Force
+                $repairs.Add($manifest.Name)
+                Write-Host "::notice::Updated hash values in $($manifest.Name)"
+              } else {
+                Write-Host "$($manifest.Name): hashes verified; no manifest change."
               }
             }
             catch {
@@ -55,19 +160,32 @@ jobs:
               Write-Host "::error::Hash check failed for $($manifest.Name): $($_.Exception.Message)"
             }
             finally {
+              if (Test-Path -LiteralPath $tempDir) {
+                Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue
+              }
               Write-Host "::endgroup::"
             }
           }
 
-          "### Hash check results" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
-          "Checked $($manifests.Count) manifests." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          @(
+            '### Hash check results'
+            "Checked $($manifests.Count) manifests."
+            "Repaired hashes: $($repairs.Count)."
+            "Failed manifests: $($failures.Count)."
+            ''
+            '#### Repaired'
+            $(if ($repairs.Count) { $repairs | ForEach-Object { "- $_" } } else { '- None' })
+            ''
+            '#### Failed'
+            $(if ($failures.Count) { $failures | ForEach-Object { "- $_" } } else { '- None' })
+          ) | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
+
           if ($failures.Count -gt 0) {
-            $failures | ForEach-Object { "- $_" } | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-            throw "$($failures.Count) manifest hash check(s) failed. See the summary above."
+            throw "$($failures.Count) manifest hash check(s) failed. See the job summary."
           }
 
       - name: Commit hash repairs
-        if: always()
+        if: always() && steps.checkout-bucket.outcome == 'success'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -75,11 +193,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- bucket
           git diff --cached --quiet
-          if ($LASTEXITCODE -ne 0) {
+          $diffExit = $LASTEXITCODE
+          if ($diffExit -eq 1) {
             git commit -m "Fix manifest hashes"
             if ($LASTEXITCODE -ne 0) { throw "Failed to commit hash repairs." }
             git push
             if ($LASTEXITCODE -ne 0) { throw "Failed to push hash repairs." }
+          } elseif ($diffExit -gt 1) {
+            throw "git diff failed with exit code $diffExit."
           } else {
             Write-Host "All manifest hashes are up to date."
           }
