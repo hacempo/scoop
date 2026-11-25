@@ -19,7 +19,7 @@
     ],
     "checkver": {
         "github": "https://github.com/daoran9/subtitle-finder",
-        "regex": "\"tag_name\":\\s*\"v([\\d.]+)\""
+        "regex": "^v([\\d.]+)$"
     },
     "autoupdate": {
         "architecture": {

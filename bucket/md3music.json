@@ -17,7 +17,7 @@
     ],
     "checkver": {
         "github": "https://github.com/zzyoxml/md3Music",
-        "regex": "\"tag_name\":\\s*\"v([\\d.]+)\""
+        "regex": "^v([\\d.]+)$"
     },
     "autoupdate": {
         "architecture": {
