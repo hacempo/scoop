@@ -18,7 +18,7 @@
     ],
     "checkver": {
         "github": "https://github.com/qingjian-team/qingjian",
-        "regex": "\"tag_name\":\\s*\"windows-v([\\d.]+)\""
+        "regex": "^windows-v([\\d.]+)$"
     },
     "autoupdate": {
         "architecture": {
