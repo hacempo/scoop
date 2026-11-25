@@ -1,5 +1,5 @@
 {
-    "version": "DCEFCB13",
+    "version": "20261123045400",
     "description": "Game translation and modification tool for players",
     "homepage": "https://mtool.app/",
     "license": {
@@ -31,9 +31,17 @@
     ],
     "checkver": {
         "url": "https://trs.mtool.app/release.php?lang=en",
-        "regex": "Latest version:\\s*(?<version>[^\\s<]+)"
+        "script": [
+            "$page -match 'Latest version:\\s*(?<id>[A-Fa-f0-9]+)\\s+(?<timestamp>\\d+)'",
+            "$id = $matches.id",
+            "$zone = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')",
+            "$date = [DateTimeOffset]::FromUnixTimeSeconds([long]$matches.timestamp).UtcDateTime",
+            "$timestamp = [TimeZoneInfo]::ConvertTimeFromUtc($date, $zone).ToString('yyyyMMddHHmmss', [Globalization.CultureInfo]::InvariantCulture)",
+            "Write-Output \"$timestamp $id\""
+        ],
+        "regex": "(?<version>\\d{14}) (?<id>[A-Fa-f0-9]+)"
     },
     "autoupdate": {
-        "url": "https://apk.mtool.app/releases/MTool_$version.zip"
+        "url": "https://apk.mtool.app/releases/MTool_$matchId.zip"
     }
 }
