@@ -1,29 +1,27 @@
 {
-    "version": "1.20.0",
+    "version": "1.20.1",
     "description": "A multi-platform network debugging and traffic splitting client based on Mihomo (Clash Meta)",
     "homepage": "https://github.com/appshubcc/Bettbox",
     "license": "GPL-3.0-or-later",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/appshubcc/Bettbox/releases/download/v1.20.0/Bettbox-1.20.0-windows-amd64-compatible-portable.zip",
-            "hash": "440e2baeb25e768a8a9efe35a05c5817495c69d86463332dd95659f27d57d7c1"
+            "url": "https://github.com/appshubcc/Bettbox/releases/download/v1.20.1/Bettbox-1.20.1-windows-amd64-setup.exe",
+            "hash": "23f6ff849d5fb1b7fe2e505ad372d9a1fb4e9a824f7e888a4f9f8fdc56e01713"
         }
     },
-    "extract_dir": "Bettbox",
+    "innosetup": true,
     "shortcuts": [
         [
             "Bettbox.exe",
             "Bettbox"
         ]
     ],
-    "persist": "portable",
-    "checkver": {
-        "github": "https://github.com/appshubcc/Bettbox"
-    },
+    "pre_uninstall": "if (Get-Service -Name 'BettboxHelperService' -ErrorAction SilentlyContinue | Where-Object { $_.Status -eq 'Running' }) { info \"If file locks prevent uninstallation, run 'sudo sc stop BettboxHelperService' and 'sudo sc delete BettboxHelperService' manually.\" }",
+    "checkver": "github",
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/appshubcc/Bettbox/releases/download/v$version/Bettbox-$version-windows-amd64-compatible-portable.zip"
+                "url": "https://github.com/appshubcc/Bettbox/releases/download/v$version/Bettbox-$version-windows-amd64-setup.exe"
             }
         }
     }
