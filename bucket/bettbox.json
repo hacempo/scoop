@@ -10,13 +10,19 @@
         }
     },
     "innosetup": true,
+    "persist": [
+        "data"
+    ],
+    "post_install": [
+        "$persisted = Join-Path $persist_dir 'data'; $appData = Join-Path $env:APPDATA 'com.appshub.bettbox'; New-Item -ItemType Directory -Path $persist_dir -Force | Out-Null; if (Test-Path -LiteralPath $appData) { $item = Get-Item -LiteralPath $appData -Force; if ($item.LinkType -ne 'Junction' -and $item.LinkType -ne 'SymbolicLink') { if (-not (Test-Path -LiteralPath $persisted)) { Move-Item -LiteralPath $appData -Destination $persisted } else { & robocopy $appData $persisted /E /COPY:DAT /DCOPY:DAT /R:1 /W:1 /XJ /XC /XN /XO | Out-Null; if ($LASTEXITCODE -ge 8) { throw 'Failed to merge existing Bettbox data into Scoop persist directory.' }; Rename-Item -LiteralPath $appData -NewName ('com.appshub.bettbox.scoop-backup-' + (Get-Date -Format 'yyyyMMddHHmmss')) } } }; if (-not (Test-Path -LiteralPath $appData)) { New-Item -ItemType Junction -Path $appData -Target $persisted | Out-Null }"
+    ],
     "shortcuts": [
         [
             "Bettbox.exe",
             "Bettbox"
         ]
     ],
-    "pre_uninstall": "if (Get-Service -Name 'BettboxHelperService' -ErrorAction SilentlyContinue | Where-Object { $_.Status -eq 'Running' }) { info \"If file locks prevent uninstallation, run 'sudo sc stop BettboxHelperService' and 'sudo sc delete BettboxHelperService' manually.\" }",
+    "pre_uninstall": "$appData = Join-Path $env:APPDATA 'com.appshub.bettbox'; if (Test-Path -LiteralPath $appData) { $item = Get-Item -LiteralPath $appData -Force; if ($item.LinkType -eq 'Junction' -or $item.LinkType -eq 'SymbolicLink') { Remove-Item -LiteralPath $appData -Force } }; if (Get-Service -Name 'BettboxHelperService' -ErrorAction SilentlyContinue | Where-Object { $_.Status -eq 'Running' }) { info \"If file locks prevent uninstallation, stop BettboxHelperService before retrying.\" }",
     "checkver": "github",
     "autoupdate": {
         "architecture": {
