@@ -1,5 +1,5 @@
 {
-    "version": "2026.11.23.125400",
+    "version": "20261123045400",
     "description": "Game translation and modification tool for players",
     "homepage": "https://mtool.app/",
     "license": {
@@ -34,10 +34,12 @@
         "script": [
             "$page -match 'Latest version:\\s*(?<id>[A-Fa-f0-9]+)\\s+(?<timestamp>\\d+)'",
             "$id = $matches.id",
-            "$timestamp = [DateTimeOffset]::FromUnixTimeSeconds([long]$matches.timestamp).UtcDateTime.ToString('yyyy.MM.dd.HHmmss', [Globalization.CultureInfo]::InvariantCulture)",
+            "$zone = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')",
+            "$date = [DateTimeOffset]::FromUnixTimeSeconds([long]$matches.timestamp).UtcDateTime",
+            "$timestamp = [TimeZoneInfo]::ConvertTimeFromUtc($date, $zone).ToString('yyyyMMddHHmmss', [Globalization.CultureInfo]::InvariantCulture)",
             "Write-Output \"$timestamp $id\""
         ],
-        "regex": "(?<version>\\d{4}\\.\\d{2}\\.\\d{2}\\.\\d{6}) (?<id>[A-Fa-f0-9]+)"
+        "regex": "(?<version>\\d{14}) (?<id>[A-Fa-f0-9]+)"
     },
     "autoupdate": {
         "url": "https://apk.mtool.app/releases/MTool_$matchId.zip"
